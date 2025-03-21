@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Servidor Rasa para el chatbot
+  rasa:
+    build:
+      context: ./backend/rasa
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./backend/rasa:/app
+    command: run --enable-api --cors "*" --debug
+    networks:
+      - bot-network
+
+  # Servidor de acciones de Rasa
+  rasa-actions:
+    build:
+      context: ./backend/rasa
+      dockerfile: Dockerfile.actions
+    ports:
+      - "5055:5055"
+    volumes:
+      - ./backend/rasa/actions:/app/actions
+      - ./backend/scraper:/app/scraper
+    command: run actions
+    networks:
+      - bot-network
+    depends_on:
+      - rasa
+
+  # API para comunicación entre React y Rasa
+  api:
+    build:
+      context: ./backend/api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/api:/app
+    networks:
+      - bot-network
+    depends_on:
+      - rasa
+    environment:
+      - RASA_URL=http://rasa:5005
+
+  # Frontend React
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    networks:
+      - bot-network
+    depends_on:
+      - api
+
+networks:
+  bot-network:
+    driver: bridge

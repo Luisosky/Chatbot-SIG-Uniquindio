@@ -1,0 +1,78 @@
+# Dependencias
+node_modules/
+/frontend/node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+/frontend/coverage
+
+# Producción
+/build
+/frontend/build
+
+# Archivos Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Modelos Rasa
+/backend/rasa/models/
+
+# Archivos de configuración
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs y editores
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Temporal
+.tmp
+.temp
+
+# Base de datos
+*.sqlite
+*.sqlite3
+*.db
+
+# Archivos específicos de Docker
+.dockerignore
