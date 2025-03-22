@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/UI/Header';
 import Footer from '../components/UI/Footer';
 import ChatWidget from '../components/Chat/ChatWidget';
 import '../styles/ChatPage.css';
 
 const ChatPage = () => {
-  // Lista simulada de sistemas para el sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
+
   const systems = [
     { id: 'siac', code: 'SIAC', name: 'Sistema Interno de Aseguramiento de la Calidad' },
     { id: 'sgsst', code: 'SGSST', name: 'Sistema de Gestión de Seguridad y Salud en el Trabajo' },
@@ -13,8 +15,7 @@ const ChatPage = () => {
     { id: 'sgl', code: 'SGL', name: 'Sistema de Gestión Laboratorios' },
     { id: 'ssi', code: 'SSI', name: 'Sistema de Seguridad de la Información' }
   ];
-  
-  // Historial simulado de conversaciones
+
   const conversationHistory = [
     { date: '2025-03-20', title: 'Consulta sobre documentos SIAC' },
     { date: '2025-03-18', title: 'Búsqueda de formatos' },
@@ -24,9 +25,17 @@ const ChatPage = () => {
   return (
     <div className="chat-page">
       <Header />
-      
+
+      {/* Botón para abrir/cerrar el sidebar */}
+      <button
+        className="sidebar-toggle-button"
+        onClick={toggleSidebar}
+      >
+        {sidebarOpen ? 'Cerrar Menú' : '☰ Abrir Menú'}
+      </button>
+
       <div className="chat-container">
-        <div className="chat-sidebar">
+        <aside className={`chat-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
           <div className="sidebar-section">
             <h3 className="sidebar-title">Sistemas</h3>
             <ul className="systems-list">
@@ -39,7 +48,7 @@ const ChatPage = () => {
               ))}
             </ul>
           </div>
-          
+
           <div className="sidebar-section">
             <h3 className="sidebar-title">Conversaciones Recientes</h3>
             <ul className="history-list">
@@ -53,7 +62,7 @@ const ChatPage = () => {
               ))}
             </ul>
           </div>
-          
+
           <div className="sidebar-section">
             <h3 className="sidebar-title">Sugerencias</h3>
             <div className="suggestions-list">
@@ -62,18 +71,17 @@ const ChatPage = () => {
               <button className="suggestion-button">Formatos disponibles</button>
             </div>
           </div>
-        </div>
-        
+        </aside>
+
         <div className="chat-main">
           <div className="chat-header-info">
             <h2>Asistente Virtual SIG</h2>
             <p>Consulta información sobre documentos, procesos y sistemas</p>
           </div>
-          
           <ChatWidget />
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

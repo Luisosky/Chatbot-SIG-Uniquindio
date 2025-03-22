@@ -1,0 +1,49 @@
+.chat-toggle-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: var(--box-shadow-md);
+    z-index: 1000;
+  }
+  
+  .chat-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .chat-modal {
+    background: #fff;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80%;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .close-button {
+    align-self: flex-end;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    padding: 10px;
+    cursor: pointer;
+  }

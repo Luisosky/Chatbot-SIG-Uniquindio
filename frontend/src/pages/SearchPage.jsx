@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../components/UI/Header';
 import Footer from '../components/UI/Footer';
 import '../styles/SearchPage.css';
+import ChatToggle from '../components/Chat/ChatToggle';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -247,6 +248,7 @@ const SearchPage = () => {
       </main>
       
       <Footer />
+      <ChatToggle />
     </div>
   );
 };

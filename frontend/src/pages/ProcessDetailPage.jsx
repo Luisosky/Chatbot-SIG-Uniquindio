@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Header from '../components/UI/Header';
 import Footer from '../components/UI/Footer';
 import '../styles/ProcessDetailPage.css';
+import ChatToggle from '../components/Chat/ChatToggle';
 
 const ProcessDetailPage = () => {
   const { systemId, processId } = useParams();
@@ -149,6 +150,7 @@ const ProcessDetailPage = () => {
       </main>
       
       <Footer />
+      <ChatToggle />
     </div>
   );
 };

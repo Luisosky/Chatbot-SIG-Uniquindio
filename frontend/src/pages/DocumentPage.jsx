@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import Header from '../components/UI/Header';
 import Footer from '../components/UI/Footer';
 import '../styles/DocumentPage.css';
+import ChatToggle from '../components/Chat/ChatToggle';
 
 const DocumentPage = () => {
   const { documentId } = useParams();
@@ -169,6 +170,7 @@ const DocumentPage = () => {
       </main>
       
       <Footer />
+      <ChatToggle />
     </div>
   );
 };

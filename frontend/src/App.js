@@ -108,8 +108,8 @@ function App() {
         onClick={toggleTheme}
         style={{
           position: 'fixed',
-          top: '10px',
-          right: '10px',
+          top: '18px',
+          right: '170px',
           zIndex: 1000,
           padding: '8px 12px',
           border: 'none',

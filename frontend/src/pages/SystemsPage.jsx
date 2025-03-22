@@ -4,6 +4,7 @@ import Header from '../components/UI/Header';
 import Footer from '../components/UI/Footer';
 import SystemsOverview from '../components/Systems/SystemsOverview';
 import '../styles/SystemsPage.css';
+import ChatToggle from '../components/Chat/ChatToggle';
 
 const SystemsPage = () => {
   return (
@@ -40,6 +41,7 @@ const SystemsPage = () => {
       </main>
       
       <Footer />
+      <ChatToggle />
     </div>
   );
 };
