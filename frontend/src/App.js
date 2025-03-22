@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import HomePage from './pages/HomePage';
@@ -15,7 +15,7 @@ import './App.css';
 // Componente contenedor para AnimatePresence
 function AnimatedRoutes() {
   const location = useLocation();
-  
+
   return (
     <div style={{ position: 'relative', minHeight: '100vh' }}>
       <AnimatePresence mode="wait" initial={false}>
@@ -91,8 +91,35 @@ function AnimatedRoutes() {
 }
 
 function App() {
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    // Aplicar el tema al cargar la aplicación (black mode)
+    document.body.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   return (
     <Router>
+      <button
+        onClick={toggleTheme}
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          padding: '8px 12px',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          backgroundColor: 'transparent',
+        }}
+      >
+        {theme === 'light' ? '☀️' : '🌙'}
+      </button>
       <AnimatedRoutes />
     </Router>
   );
