@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdMenu, MdClose, MdPushPin, MdOutlineClear } from 'react-icons/md';
 import Header from '../components/UI/Header';
 import Footer from '../components/UI/Footer';
@@ -17,38 +17,39 @@ const ChatPage = () => {
     { id: 'ssi', code: 'SSI', name: 'Sistema de Seguridad de la Información' }
   ];
 
-  // Estado para historial y conversaciones fijadas
   const [conversationHistory, setConversationHistory] = useState([
     { id: 1, date: '2025-03-20', title: 'Consulta sobre documentos SIAC' },
     { id: 2, date: '2025-03-18', title: 'Búsqueda de formatos' },
     { id: 3, date: '2025-03-15', title: 'Información sobre procesos' }
   ]);
-  const [pinnedConversations, setPinnedConversations] = useState([]);
+  
+  const [pinnedConversations, setPinnedConversations] = useState(() => {
+    const savedPinned = localStorage.getItem('pinnedConversations');
+    return savedPinned ? JSON.parse(savedPinned) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('pinnedConversations', JSON.stringify(pinnedConversations));
+  }, [pinnedConversations]);
 
   const pinConversation = (conversation) => {
-    // Si ya está fijada, la removemos; de lo contrario, la agregamos
-    if (pinnedConversations.find(item => item.id === conversation.id)) {
-      setPinnedConversations(prev => prev.filter(item => item.id !== conversation.id));
-    } else {
-      setPinnedConversations(prev => [...prev, conversation]);
-    }
+    setPinnedConversations(prev => {
+      const isPinned = prev.some(item => item.id === conversation.id);
+      return isPinned ? prev.filter(item => item.id !== conversation.id) : [...prev, conversation];
+    });
   };
 
   const clearHistory = () => {
     setConversationHistory([]);
     setPinnedConversations([]);
+    localStorage.removeItem('pinnedConversations');
   };
 
   return (
     <div className="chat-page">
       <Header />
-
       <div className="chat-container">
-        {/* Botón global para abrir/cerrar el sidebar con clase condicional */}
-        <button
-          className={`global-sidebar-toggle-button ${sidebarOpen ? 'open' : ''}`}
-          onClick={toggleSidebar}
-        >
+        <button className={`global-sidebar-toggle-button ${sidebarOpen ? 'open' : ''}`} onClick={toggleSidebar}>
           {sidebarOpen ? <MdClose /> : <MdMenu />}
         </button>
 
@@ -58,9 +59,7 @@ const ChatPage = () => {
             <ul className="systems-list">
               {systems.map(system => (
                 <li key={system.id} className="system-item">
-                  <button className="system-button">
-                    {system.code} - {system.name}
-                  </button>
+                  <button className="system-button">{system.code} - {system.name}</button>
                 </li>
               ))}
             </ul>
@@ -86,11 +85,7 @@ const ChatPage = () => {
           <div className="sidebar-section">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 className="sidebar-title">Conversaciones Recientes</h3>
-              <button 
-                onClick={clearHistory}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--uniquindio-green)' }}
-                title="Limpiar historial"
-              >
+              <button onClick={clearHistory} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--uniquindio-green)' }} title="Limpiar historial">
                 <MdOutlineClear size={20} />
               </button>
             </div>
@@ -105,15 +100,6 @@ const ChatPage = () => {
               ))}
             </ul>
           </div>
-
-          <div className="sidebar-section">
-            <h3 className="sidebar-title">Sugerencias</h3>
-            <div className="suggestions-list">
-              <button className="suggestion-button">Documentos recientes</button>
-              <button className="suggestion-button">Procesos SGSST</button>
-              <button className="suggestion-button">Formatos disponibles</button>
-            </div>
-          </div>
         </aside>
 
         <div className="chat-main">
@@ -124,7 +110,6 @@ const ChatPage = () => {
           <ChatWidget />
         </div>
       </div>
-
       <Footer />
     </div>
   );
