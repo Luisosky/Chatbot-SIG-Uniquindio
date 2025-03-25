@@ -151,6 +151,8 @@ const ChatWidget = () => {
           </svg>
         </button>
       </div>
+
+
     </div>
   );
 };

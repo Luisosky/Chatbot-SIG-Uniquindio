@@ -108,15 +108,24 @@ function App() {
         onClick={toggleTheme}
         style={{
           position: 'fixed',
-          top: '18px',
-          right: '170px',
+          top: '20px',
+          right: '20px',
           zIndex: 1000,
-          padding: '8px 12px',
-          border: 'none',
-          borderRadius: '4px',
+          padding: '10px 15px',
+          border: '1px solid rgba(0, 0, 0, 0.2)',
+          borderRadius: '50%',
           cursor: 'pointer',
-          backgroundColor: 'transparent',
+          backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
+          color: theme === 'light' ? '#000' : '#fff',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.3s ease',
         }}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = 'scale(1)';
+        }}  
       >
         {theme === 'light' ? '☀️' : '🌙'}
       </button>

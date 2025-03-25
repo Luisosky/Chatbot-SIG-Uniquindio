@@ -5,9 +5,20 @@ import './ChatToggle.css';
 
 const ChatToggle = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false); 
   const navigate = useNavigate();
 
-  const toggleChat = () => setIsOpen(prev => !prev);
+  const toggleChat = () => {
+    if(isOpen){
+      setIsClosing(true);
+      setTimeout(() => {
+        setIsOpen(false);
+        setIsClosing(false);
+      }, 300);
+    }else{
+      setIsOpen(true);
+    }
+  }
 
   const handleImmersive = () => {
     navigate('/chat');
@@ -16,13 +27,11 @@ const ChatToggle = () => {
   return (
     <>
       {isOpen && (
-        <div className="chat-overlay">
+        <div className={`chat-overlay${isClosing ? ' closing' : ''}`}>
           <div className="chat-modal">
             <div className="chat-modal-header">
-              <button className="close-button" onClick={toggleChat}>X</button>
-              <button className="immersive-button" onClick={handleImmersive}>
-                ⛶ Inmersivo
-              </button>
+            <button className="immersive-button" title="inmsersivo" onClick={handleImmersive}>⛶</button>
+            <button className="close-button" title="cerrar chat" onClick={toggleChat}>X</button>
             </div>
             <ChatWidget />
           </div>

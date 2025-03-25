@@ -1,10 +1,11 @@
 import React from 'react';
 import Header from '../components/UI/Header';
 import Footer from '../components/UI/Footer';
+import ChatToggle from '../components/Chat/ChatToggle';
 import SystemsOverview from '../components/Systems/SystemsOverview';
 import PageTransition from '../components/PageTransition';
 import '../styles/HomePage.css';
-import ChatToggle from '../components/Chat/ChatToggle';
+
 
 const HomePage = () => {
   return (

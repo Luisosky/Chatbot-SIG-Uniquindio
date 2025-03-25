@@ -5,15 +5,32 @@
   background-color: var(--bg-secondary);
 }
 
+
 .chat-container {
-  display: flex;
   flex: 1;
+  display: flex;
   padding: var(--space-lg);
   max-width: 1200px;
   margin: 0 auto;
   gap: var(--space-lg);
   position: relative;
 }
+
+/* Botón global de toggle para el sidebar */
+.global-sidebar-toggle-button {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  padding: 4px;
+  border: none;
+  background: transparent;
+  font-size: 2rem;
+  color: var(--primary-color);
+  cursor: pointer;
+  z-index: 1300;
+  transition: left 0.3s ease;
+}
+
 
 /* Sidebar con transición */
 .chat-sidebar {
@@ -24,14 +41,14 @@
   box-shadow: var(--box-shadow-md);
   border: 1px solid rgba(0, 132, 61, 0.2);
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-  position: absolute;
+  position: fixed;
   left: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 100;
+  position: sticky;
+  top: 70px;
+  max-height: 500px;
+  z-index: 90;
   overflow-y: auto;
 }
-
 .chat-sidebar.closed {
   transform: translateX(-110%);
   opacity: 0;
@@ -44,6 +61,7 @@
   pointer-events: auto;
 }
 
+/* Resto de estilos para las secciones */
 .sidebar-section {
   margin-bottom: var(--space-xl);
 }
@@ -133,7 +151,9 @@
   padding: var(--space-lg);
   box-shadow: var(--box-shadow-md);
   border: 1px solid var(--uniquindio-green);
-  margin-left: 320px; /* Asegura espacio para el sidebar cuando esté abierto */
+  margin-left: 320px; 
+  margin-top: 70px;
+  margin-bottom: 70px;
 }
 
 .chat-header-info {
@@ -154,21 +174,6 @@
   font-size: var(--font-size-sm);
 }
 
-/* Botón de toggle para el sidebar */
-.sidebar-toggle-button {
-  position: fixed;
-  top: 90px;
-  left: 10px;
-  z-index: 1100;
-  padding: 8px 12px;
-  border: none;
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
-  background-color: transparent;
-  font-size: var(--font-size-md);
-  color: var(--primary-color);
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .chat-container {
@@ -178,16 +183,33 @@
   }
   
   .chat-sidebar {
-    position: static;
     width: 100%;
-    transform: translateX(0);
+    max-width: 350px;
+    position: fixed;
+    left: 0;
+    top: 70px;
+    bottom: 0;
+    transform: translateX(-100%);
     opacity: 1;
     pointer-events: auto;
     margin-bottom: var(--space-lg);
+    z-index: 1200;
   }
   
+  .chat-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); 
+  }
+
   .chat-main {
     margin-left: 0;
     padding: var(--space-md);
+    width: 100%;
+    transition: opacity 0.3s ease;
   }
+
+  .chat-sidebar.open ~ .chat-main {
+    opacity: 0.8;
+  }
+
 }

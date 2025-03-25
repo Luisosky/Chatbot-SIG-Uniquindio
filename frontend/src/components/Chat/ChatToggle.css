@@ -1,49 +1,68 @@
 .chat-toggle-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: var(--primary-color);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: var(--box-shadow-md);
-    z-index: 1000;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #7CFC00;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: background-color 0.3s ease;
+}
+
+.chat-toggle-button:hover {
+  background-color: #228B22;
+}
+
+.chat-overlay {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 300px;
+  max-width: 90%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
   }
-  
-  .chat-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+  to {
+      opacity: 1;
+      transform: translateY(0);
   }
-  
-  .chat-modal {
-    background: #fff;
-    width: 90%;
-    max-width: 400px;
-    max-height: 80%;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--box-shadow-lg);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  
-  .close-button {
-    align-self: flex-end;
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    padding: 10px;
-    cursor: pointer;
-  }
+}
+
+.chat-modal-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.close-button, .immersive-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 8px;
+  color: #32CD32;
+}
+
+.close-button:hover, .immersive-button:hover {
+  color: #32CD32;
+}
+
+.chat-modal {
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+}

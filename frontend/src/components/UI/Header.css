@@ -80,6 +80,12 @@
   background-color: rgba(0, 132, 61, 0.18);
 }
 
+.theme-toggle-button {
+  position: relative;
+  margin-left: auto;
+  font-size: 1.2rem;
+}
+
 @media (max-width: var(--breakpoint-md)) {
   .header-container {
     height: auto;
