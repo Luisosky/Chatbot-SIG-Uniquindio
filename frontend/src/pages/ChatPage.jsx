@@ -39,10 +39,14 @@ const ChatPage = () => {
     });
   };
 
+ 
+  const removePinnedConversation = (id) => {
+    setPinnedConversations(prev => prev.filter(item => item.id !== id));
+  };
+
+  
   const clearHistory = () => {
     setConversationHistory([]);
-    setPinnedConversations([]);
-    localStorage.removeItem('pinnedConversations');
   };
 
   return (
@@ -70,11 +74,22 @@ const ChatPage = () => {
               <h3 className="sidebar-title">Conversaciones Fijadas</h3>
               <ul className="history-list">
                 {pinnedConversations.map(conversation => (
-                  <li key={conversation.id} className="history-item">
+                  <li key={conversation.id} className="history-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <button className="history-button" onClick={() => pinConversation(conversation)}>
                       <span className="history-title">{conversation.title}</span>
                       <span className="history-date">{conversation.date}</span>
                       <MdPushPin style={{ marginLeft: '5px', color: 'var(--uniquindio-green)' }} />
+                    </button>
+                    <button 
+                      className="delete-pinned-button" 
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        removePinnedConversation(conversation.id);
+                      }} 
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                      title="Eliminar fijo"
+                    >
+                      <MdClose size={20} />
                     </button>
                   </li>
                 ))}
