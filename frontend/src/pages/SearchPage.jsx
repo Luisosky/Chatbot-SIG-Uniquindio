@@ -79,7 +79,7 @@ const SearchPage = () => {
   
   // Tipos de documentos para el filtro
   const documentTypes = [
-    'Manual', 'Procedimiento', 'Formato', 'Instructivo', 'Guía', 'Política'
+    'Manual', 'Procedimiento', 'Formato', 'Instructivo', 'Guía', 'Planes', 'Protocolo', 'Ficha Técnica de Indicador ', 'Caracterización', 'Otros', 'Riesgos', 'Normograma' 
   ];
   
   return (
