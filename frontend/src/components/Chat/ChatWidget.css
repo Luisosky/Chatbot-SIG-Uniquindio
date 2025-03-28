@@ -154,7 +154,7 @@
 }
 
 .message.user .message-content {
-  background-color: #d1fad7; 
+  background-color: #d1fad7;
   border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 var(--border-radius-lg);
   position: relative;
 }
@@ -165,14 +165,6 @@
   font-size: var(--font-size-sm);
 }
 
-.user .message-content {
-  /* Azul oscuro institucional para mensajes del usuario */
-  background-color: var(--uniquindio-dark-blue);
-  color: var(--uniquindio-white);
-  align-self: flex-end;
-  margin-left: auto;
-  border-bottom-right-radius: 5px;
-}
 
 .bot .message-content {
   /* Fondo claro para mensajes del bot */
@@ -194,8 +186,7 @@
 .message-time {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  position: absolute;
-  bottom: -1.2rem;
+  margin-top: 8px;
   right: var(--space-sm);
 }
 
