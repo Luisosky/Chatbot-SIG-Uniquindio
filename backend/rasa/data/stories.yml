@@ -1,0 +1,39 @@
+version: "3.0"
+stories:
+  - story: saludo y despedida
+    steps:
+      - intent: saludo
+      - action: utter_saludo
+      - intent: despedida
+      - action: utter_despedida
+
+  - story: consulta directa de documento
+    steps:
+      - intent: obtener_documento
+      - action: action_obtener_documento
+
+  - story: consulta documento sin especificar
+    steps:
+      - intent: consultar_documento
+      - action: utter_ask_documento
+      - intent: obtener_documento
+      - action: action_obtener_documento
+
+  - story: listar documentos
+    steps:
+      - intent: listar_documentos
+      - action: action_listar_documentos
+
+  - story: buscar información en documentos
+    steps:
+      - intent: buscar_informacion
+      - action: action_buscar_en_documentos
+
+  - story: saludo y consulta genérica
+    steps:
+      - intent: saludo
+      - action: utter_saludo
+      - intent: consultar_documento
+      - action: utter_ask_documento
+      - intent: obtener_documento
+      - action: action_obtener_documento

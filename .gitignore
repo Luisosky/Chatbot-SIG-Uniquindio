@@ -1,6 +1,8 @@
 # Dependencias
 node_modules/
 /frontend/node_modules/
+/backend/rasa/rasa_env/
+.venv/
 /.pnp
 .pnp.js
 
@@ -27,6 +29,7 @@ build/
 
 # Modelos Rasa
 /backend/rasa/models/
+/backend/rasa/documentos/
 
 # Archivos de configuración
 .env
