@@ -1,7 +1,7 @@
 # Dependencias
 node_modules/
 /frontend/node_modules/
-/backend/rasa/rasa_env/
+/backend/rasa/rasa_fresh_env/
 .venv/
 /.pnp
 .pnp.js
@@ -37,6 +37,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+
 
 # Logs
 logs

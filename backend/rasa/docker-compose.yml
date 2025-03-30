@@ -1,0 +1,29 @@
+version: '3.0'
+
+services:
+  # Servidor principal de Rasa
+  rasa:
+    build:
+    context: .
+    dockerfile: Dockerfile-custom
+    image: rasa/rasa:3.5.14
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./:/app
+      - ./documentos:/app/documentos
+    command: run --enable-api --cors "*"
+    environment:
+      - RASA_DOCS_PATH=/app/documentos
+
+  # Servidor de acciones personalizadas
+  actions:
+    image: rasa/rasa-sdk:3.5.1
+    ports:
+      - "5055:5055"
+    volumes:
+      - ./actions:/app/actions
+      - ./documentos:/app/documentos
+    environment:
+      - RASA_DOCS_PATH=/app/documentos
+    command: start --actions actions
