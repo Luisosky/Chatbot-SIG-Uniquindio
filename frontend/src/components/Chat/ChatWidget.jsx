@@ -1,62 +1,115 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './ChatWidget.css';
+import ReactMarkdown from 'react-markdown';
+
+// Constantes extraídas para mejor mantenimiento y buenas practicas 
+const API_URL = "http://localhost:5005/webhooks/rest/webhook";
+const TYPING_DELAY = 500;
+const WELCOME_MESSAGE = '¡Hola! Soy el asistente del Sistema Integrado de Gestión de la UniQuindío. ¿En qué puedo ayudarte hoy?';
+
+// Crear componentes más pequeños para mejorar la legibilidad
+const TypingIndicator = () => (
+  <div className="typing-indicator">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+);
+
+const MessageTime = ({ timestamp }) => (
+  <span className="message-time">
+    {timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+  </span>
+);
 
 const ChatWidget = () => {
+  // Estado y refs existentes
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null); // Nuevo ref para el input
 
-  // Mensajes iniciales simulados
   useEffect(() => {
+    // Mensaje de bienvenida
     setMessages([
       {
         id: 1,
-        text: '¡Hola! Soy el asistente del Sistema Integrado de Gestión de la UniQuindío. ¿En qué puedo ayudarte hoy?',
+        text: WELCOME_MESSAGE,
         sender: 'bot',
         timestamp: new Date()
       }
     ]);
+    
+    // Enfocar el input al inicio
+    inputRef.current?.focus();
   }, []);
 
-  // Simular respuestas del bot (sin conexión)
-  const simulateBotResponse = (userMessage) => {
-    // Respuestas predefinidas basadas en palabras clave
-    let botResponse = {
-      id: Date.now(),
-      sender: 'bot',
-      timestamp: new Date()
-    };
+  // Extraer la lógica de envío a una función memoizada con useCallback
+  const sendMessage = useCallback(async (text) => {
+    setIsTyping(true);
+    setIsLoading(true);
 
-    if (userMessage.toLowerCase().includes('sistema')) {
-      botResponse.text = 'Los sistemas disponibles son: SIAC (Sistema Interno de Aseguramiento de la Calidad), SGSST (Sistema de Gestión de Seguridad y Salud en el Trabajo), SGA (Sistema de Gestión Ambiental), SGL (Sistema de Gestión Laboratorios) y SSI (Sistema de Seguridad de la Información).';
-    } 
-    else if (userMessage.toLowerCase().includes('documento')) {
-      botResponse.text = 'Puedo ayudarte a encontrar documentos en el Sistema Integrado de Gestión. ¿De qué sistema te gustaría obtener documentos?';
-      botResponse.buttons = [
-        { text: 'SIAC', value: 'Muéstrame documentos del SIAC' },
-        { text: 'SGSST', value: 'Muéstrame documentos del SGSST' },
-        { text: 'SGA', value: 'Muéstrame documentos del SGA' }
-      ];
-    }
-    else if (userMessage.toLowerCase().includes('siac')) {
-      botResponse.text = 'El SIAC (Sistema Interno de Aseguramiento de la Calidad) tiene procesos como: Gestión Académica, Evaluación y Acreditación. ¿Te gustaría ver documentos de alguno de estos procesos?';
-    }
-    else if (userMessage.toLowerCase().includes('proceso')) {
-      botResponse.text = 'Los procesos varían según el sistema. Por ejemplo, el SIAC tiene procesos de Gestión Académica y Acreditación. ¿De qué sistema específico quieres conocer los procesos?';
-    }
-    else {
-      botResponse.text = 'Disculpa, no tengo información específica sobre eso. ¿Puedes reformular tu pregunta? Puedo ayudarte con información sobre sistemas, procesos o documentos del Sistema Integrado de Gestión.';
-    }
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sender: "user", 
+          message: text
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      
+      const data = await response.json();
 
-    return botResponse;
-  };
+      // Añadir un pequeño retraso para simular tiempo de pensamiento del bot
+      setTimeout(() => {
+        if (data.length === 0) {
+          // Manejar respuestas vacías
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            text: "Lo siento, no encuentro una respuesta para tu consulta. ¿Podrías reformularla?",
+            sender: 'bot',
+            timestamp: new Date()
+          }]);
+        } else {
+          data.forEach((botMsg) => {
+            const newBotMessage = {
+              id: Date.now() + Math.random(),
+              text: botMsg.text,
+              sender: 'bot',
+              timestamp: new Date(),
+              buttons: botMsg.buttons
+            };
+            setMessages(prev => [...prev, newBotMessage]);
+          });
+        }
+        setIsTyping(false);
+        setIsLoading(false);
+      }, TYPING_DELAY);
+    } catch (error) {
+      console.error("Error al enviar el mensaje a Rasa:", error);
+      // Mostrar mensaje de error al usuario
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: "Lo siento, tuve un problema al procesar tu solicitud. Por favor, inténtalo de nuevo.",
+        sender: 'bot',
+        timestamp: new Date(),
+        isError: true
+      }]);
+      setIsTyping(false);
+      setIsLoading(false);
+    }
+  }, []);
 
-  // Función para enviar mensaje (simulada)
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
 
-    // Agregar mensaje del usuario
     const userMessage = {
       id: Date.now(),
       text: inputValue,
@@ -65,15 +118,14 @@ const ChatWidget = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue('');
-    setIsTyping(true);
-
-    // Simular tiempo de respuesta
-    setTimeout(() => {
-      const botResponse = simulateBotResponse(userMessage.text);
-      setMessages(prev => [...prev, botResponse]);
-      setIsTyping(false);
-    }, 1000);
+    
+    // Enfocar nuevamente el input
+    inputRef.current?.focus();
+    
+    // Enviar el mensaje al backend
+    sendMessage(currentInput);
   };
 
   // Scroll al último mensaje
@@ -83,11 +135,19 @@ const ChatWidget = () => {
 
   // Manejar clic en botones de respuesta
   const handleButtonClick = (value) => {
-    // Simular envío de mensaje como si el usuario lo hubiera escrito
     setInputValue(value);
     setTimeout(() => {
       handleSendMessage();
     }, 100);
+  };
+
+  // Renderizar mensaje con soporte markdown
+  const renderMessageContent = (text) => {
+    return (
+      <div className="message-text">
+        <ReactMarkdown>{text}</ReactMarkdown>
+      </div>
+    );
   };
 
   return (
@@ -96,19 +156,23 @@ const ChatWidget = () => {
         <h3>Asistente SIG UniQuindío</h3>
       </div>
       
-      <div className="chat-messages">
+      <div className="chat-messages" role="log" aria-live="polite">
         {messages.map((msg) => (
-          <div key={msg.id} className={`message ${msg.sender}`}>
+          <div 
+            key={msg.id} 
+            className={`message ${msg.sender} ${msg.isError ? 'error' : ''}`}
+            aria-label={`Mensaje de ${msg.sender === 'bot' ? 'asistente' : 'usuario'}`}
+          >
             <div className="message-content">
-              <p>{msg.text}</p>
+              {renderMessageContent(msg.text)}
               
-              {/* Botones de respuesta rápida */}
-              {msg.buttons && (
+              {msg.buttons && msg.buttons.length > 0 && (
                 <div className="message-buttons">
                   {msg.buttons.map((btn, index) => (
                     <button 
                       key={index} 
                       onClick={() => handleButtonClick(btn.value)}
+                      className="response-button"
                     >
                       {btn.text}
                     </button>
@@ -116,19 +180,15 @@ const ChatWidget = () => {
                 </div>
               )}
               
-              <span className="message-time">
-                {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
+              <MessageTime timestamp={msg.timestamp} />
             </div>
           </div>
         ))}
         
         {isTyping && (
-          <div className="message bot typing">
-            <div className="typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
+          <div className="message bot typing" aria-label="El asistente está escribiendo">
+            <div className="message-content">
+              <TypingIndicator />
             </div>
           </div>
         )}
@@ -139,20 +199,26 @@ const ChatWidget = () => {
       <div className="chat-input-container">
         <input
           type="text"
+          ref={inputRef}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Escribe tu mensaje..."
-          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+          onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
           className="chat-input"
+          disabled={isLoading}
+          aria-label="Mensaje para el asistente"
         />
-        <button onClick={handleSendMessage} className="send-button">
+        <button 
+          onClick={handleSendMessage} 
+          className={`send-button ${isLoading ? 'disabled' : ''}`}
+          disabled={isLoading}
+          aria-label="Enviar mensaje"
+        >
           <svg viewBox="0 0 24 24" width="24" height="24">
             <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
           </svg>
         </button>
       </div>
-
-
     </div>
   );
 };
