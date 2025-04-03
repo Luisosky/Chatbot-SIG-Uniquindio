@@ -10,3 +10,7 @@ tracker_store:
 
 telemetry:
   enabled: false
+
+
+webservice.CustomConnector:
+  webhook_url: "http://localhost:5005/webhooks/rest/webhook"

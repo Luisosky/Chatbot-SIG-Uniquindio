@@ -1,0 +1,67 @@
+version: "3.0"
+
+intents:
+  - saludo
+  - despedida
+  - obtener_documento
+  - listar_documentos
+  - buscar_informacion
+  - consultar_documento
+
+entities:
+  - documento
+  - search_term
+
+slots:
+  documento:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: documento
+  search_term:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: search_term
+  last_document_content:
+    type: text
+    mappings:
+    - type: custom
+  last_document_files:
+    type: list
+    mappings:
+    - type: custom
+  content_offset:
+    type: float
+    mappings:
+    - type: custom
+  search_results:
+    type: list
+    mappings:
+    - type: custom
+  result_page:
+    type: float
+    mappings:
+    - type: custom
+  last_search_term:
+    type: text
+    mappings:
+    - type: custom
+
+responses:
+  utter_saludo:
+    - text: "¡Hola! ¿En qué puedo ayudarte?"
+  utter_despedida:
+    - text: "¡Hasta luego!"
+  utter_ask_documento:
+    - text: "¿Qué documento quieres consultar?"
+  utter_ask_search_term:
+    - text: "¿Qué información estás buscando específicamente?"
+  utter_opciones:
+    - text: "Puedo ayudarte con:\n- Mostrar documentos disponibles\n- Buscar información específica\n- Consultar un documento completo"
+
+actions:
+  - action_obtener_documento
+  - action_buscar_en_documentos
+  - action_listar_documentos
+  - action_mostrar_mas_contenido

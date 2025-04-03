@@ -4,8 +4,8 @@ services:
   # Servidor principal de Rasa
   rasa:
     build:
-    context: .
-    dockerfile: Dockerfile-custom
+      context: .
+      dockerfile: Dockerfile-custom
     image: rasa/rasa:3.5.14
     ports:
       - "5005:5005"
@@ -18,7 +18,9 @@ services:
 
   # Servidor de acciones personalizadas
   actions:
-    image: rasa/rasa-sdk:3.5.1
+    build:
+      context: .
+      dockerfile: Dockerfile.actions
     ports:
       - "5055:5055"
     volumes:

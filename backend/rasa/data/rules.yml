@@ -6,6 +6,7 @@ rules:
     - action: utter_despedida
 
   - rule: Saludo seguido de opciones
+    conversation_start: true
     steps:
     - intent: saludo
     - action: utter_saludo

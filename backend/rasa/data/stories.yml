@@ -4,6 +4,7 @@ stories:
     steps:
       - intent: saludo
       - action: utter_saludo
+      - action: utter_opciones
       - intent: despedida
       - action: utter_despedida
 
@@ -33,6 +34,7 @@ stories:
     steps:
       - intent: saludo
       - action: utter_saludo
+      - action: utter_opciones
       - intent: consultar_documento
       - action: utter_ask_documento
       - intent: obtener_documento
