@@ -17,7 +17,7 @@ if not exist "endpoints.yml" (
 )
 
 if not exist "config.yml" (
-  echo language: es >> config.yml
+  echo language: es > config.yml
   echo pipeline: >> config.yml
   echo   - name: WhitespaceTokenizer >> config.yml
   echo   - name: RegexFeaturizer >> config.yml
@@ -41,21 +41,24 @@ if not exist "actions\__init__.py" (
   echo. > actions\__init__.py
 )
 
+REM Crear archivo actions.py sin usar redirección para caracteres especiales
 if not exist "actions\actions.py" (
-  echo from typing import Any, Text, Dict, List >> actions\actions.py
-  echo from rasa_sdk import Action, Tracker >> actions\actions.py
-  echo from rasa_sdk.executor import CollectingDispatcher >> actions\actions.py
-  echo. >> actions\actions.py
-  echo class ActionHelloWorld(Action): >> actions\actions.py
-  echo     def name(self) -^> Text: >> actions\actions.py
-  echo         return "action_hello_world" >> actions\actions.py
-  echo. >> actions\actions.py
-  echo     def run(self, dispatcher: CollectingDispatcher, >> actions\actions.py
-  echo             tracker: Tracker, >> actions\actions.py
-  echo             domain: Dict[Text, Any]) -^> List[Dict[Text, Any]]: >> actions\actions.py
-  echo. >> actions\actions.py
-  echo         dispatcher.utter_message(text="Hello World!") >> actions\actions.py
-  echo         return [] >> actions\actions.py
+  (
+    echo from typing import Any, Text, Dict, List
+    echo from rasa_sdk import Action, Tracker
+    echo from rasa_sdk.executor import CollectingDispatcher
+    echo.
+    echo class ActionHelloWorld^(Action^):
+    echo     def name^(self^) -^> Text:
+    echo         return "action_hello_world"
+    echo.
+    echo     def run^(self, dispatcher: CollectingDispatcher,
+    echo             tracker: Tracker,
+    echo             domain: Dict[Text, Any]^) -^> List[Dict[Text, Any]]:
+    echo.
+    echo         dispatcher.utter_message^(text="Hello World!"^)
+    echo         return []
+  ) > actions\actions.py
 )
 
 echo Configuración completada. Ejecuta 'docker-compose up' para iniciar Rasa.
