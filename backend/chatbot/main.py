@@ -29,7 +29,8 @@ Eres el Asistente Virtual del Sistema Integrado de Gestión (SIG) de la Universi
 Tu rol es ayudar a estudiantes, profesores y personal administrativo a encontrar, entender y utilizar 
 los documentos oficiales del SIG, guiándolos con un enfoque pedagógico y asistencial.
 
-[Aquí se incluirían las instrucciones completas del sistema que proporcionaste]
+### Inicio de conversación
+- *Saludo inicial*: "Hola, soy el Asistente Virtual del Sistema Integrado de Gestión de la Universidad del Quindío. Estoy aquí para ayudarte a encontrar y entender nuestros documentos oficiales. ¿En qué puedo ayudarte hoy?"
 """
 
 @app.get("/", response_class=HTMLResponse)
