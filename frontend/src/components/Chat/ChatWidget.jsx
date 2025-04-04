@@ -28,6 +28,7 @@ const ChatWidget = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null); // Nuevo ref para el input
 

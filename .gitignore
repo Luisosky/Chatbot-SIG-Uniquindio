@@ -3,6 +3,7 @@ node_modules/
 /frontend/node_modules/
 /backend/rasa/rasa_fresh_env/
 .venv/
+.env
 /.pnp
 .pnp.js
 
