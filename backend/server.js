@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const chatRoutes = require('./routes/chatRoutes');
+const chatRoutes = require('./routes/chatBotRoutes');
+const { sendToMistral } = require('./services/mistralServices');
 
 const app = express();
 const PORT = process.env.PORT || 5005;
@@ -22,11 +23,37 @@ app.post('/webhooks/rest/webhook', async (req, res) => {
       return res.status(400).json({ error: 'El mensaje es requerido' });
     }
     
-
     const response = await sendToMistral(message);
+    
+    // Analizar si hay comandos especiales en la respuesta
+    let buttons = [];
+    
+    // Detectar IDs de documentos mencionados
+    const docIds = [...response.matchAll(/([A-Z]+-[A-Z]+-\d+)/g)].map(match => match[0]);
+    if (docIds.length > 0) {
+      // Eliminar duplicados
+      const uniqueIds = [...new Set(docIds)];
+      
+      // Buscar información de cada documento
+      const sigKnowledge = require('./data/sigKnowledge');
+      uniqueIds.forEach(id => {
+        const doc = sigKnowledge.find(d => d.id === id);
+        if (doc) {
+          buttons.push({
+            text: `Descargar ${doc.id}`,
+            value: `Quiero descargar el documento ${doc.id}`
+          });
+          buttons.push({
+            text: `Resumen de ${doc.id}`,
+            value: `Dame un resumen del documento ${doc.id}`
+          });
+        }
+      });
+    }
     
     res.json([{
       text: response,
+      buttons: buttons.length > 0 ? buttons : undefined
     }]);
   } catch (error) {
     console.error('Error en webhook:', error);

@@ -54,6 +54,38 @@
   letter-spacing: 0.2px;
 }
 
+/* Botón de Reset */
+.reset-button {
+  background: transparent;
+  border: none;
+  color: var(--uniquindio-white);
+  cursor: pointer;
+  padding: var(--space-xs);
+  position: absolute;
+  right: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reset-button:hover {
+  opacity: 1;
+}
+
+.reset-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reset-button svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* Área de mensajes */
 .chat-messages {
   flex: 1;
@@ -256,6 +288,147 @@
 .message-text strong, 
 .message-text b {
   font-weight: 600;
+}
+
+/* Formularios dinámicos */
+.dynamic-form {
+  background: var(--uniquindio-white);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-lg);
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.dynamic-form h4 {
+  margin-top: 0;
+  color: var(--uniquindio-dark-gray);
+  font-size: var(--font-size-md);
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid #eee;
+  padding-bottom: var(--space-sm);
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: var(--space-lg);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-size: var(--font-size-sm);
+  color: var(--uniquindio-dark-gray);
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--uniquindio-green);
+  outline: none;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.submit-btn {
+  background-color: var(--uniquindio-green);
+  color: white;
+  border: none;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.cancel-btn {
+  background-color: var(--uniquindio-light-gray);
+  color: var(--uniquindio-dark-gray);
+  border: 1px solid #ddd;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: var(--uniquindio-dark-green);
+}
+
+.cancel-btn:hover {
+  background-color: #e5e5e5;
+}
+
+.message.bot.form .message-content {
+  max-width: 85%;
+  padding: var(--space-sm);
+}
+
+/* Estilos para destacar documentos en mensajes */
+.document-reference {
+  background-color: rgba(0, 132, 61, 0.08);
+  border-left: 3px solid var(--uniquindio-green);
+  padding: var(--space-xs) var(--space-sm);
+  margin: var(--space-xs) 0;
+  border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+}
+
+/* Ajustes para mejorar la visualización de documentos del SIG */
+.document-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--uniquindio-green);
+  text-decoration: none;
+  font-weight: 500;
+  margin: var(--space-xs) 0;
+}
+
+.document-link:hover {
+  text-decoration: underline;
+}
+
+.document-link svg {
+  width: 16px;
+  height: 16px;
+  margin-right: var(--space-xs);
+}
+
+/* Indicador de error en formularios */
+.form-error {
+  color: #ff4757;
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-xs);
+}
+
+/* Mejoras para accesibilidad */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 /* Responsive */

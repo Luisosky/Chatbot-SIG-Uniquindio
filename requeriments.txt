@@ -7,5 +7,5 @@
  }   
 
 You can use this command in order to install all the dependencies{
-    "npm install axios dotenv express cors"
+    "npm install axios dotenv express cors nodemailer"
 }
