@@ -14,6 +14,7 @@ node_modules/
 # Producción
 /build
 /frontend/build
+/backend/utils
 
 # Archivos Python
 __pycache__/

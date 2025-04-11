@@ -1,3 +1,5 @@
+const path = require('path');
+
 /**
  * Base de conocimiento sobre el SIG para el contexto del chatbot
  * Estructura diseñada para facilitar la búsqueda y entrega de documentos
@@ -12,6 +14,7 @@ const sigKnowledge = [
     applicationContext: "Capacitación del personal operativo y estudiantes del SIG en la Universidad del Quindío",
     relevantDates: ["2024/02/01"],
     downloadURL: "https://intraweb2024.uniquindio.edu.co/index.php?option=com_formasonline&formasonlineform=Documentos_pub",
+    filePath: path.join(__dirname, '..', '..', 'documents', 'VIG-SGL-BPM-INT-08.pdf'),
     relatedDocuments: [],
     category: "Capacitación",
     keywords: ["capacitación", "plantas piloto", "instructivo", "SIG", "universidad"]

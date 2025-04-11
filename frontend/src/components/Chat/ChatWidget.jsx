@@ -148,7 +148,7 @@ const ChatWidget = () => {
   }, []);
 
   // Función para reiniciar la conversación
-  const handleResetConversation = async () => {
+  const handleResetConversation = useCallback(async () => {
     if (isLoading) return;
     
     setIsLoading(true);
@@ -175,8 +175,8 @@ const ChatWidget = () => {
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  };
-  
+  }, [isLoading]);
+
   // Extraer la lógica de envío a una función memoizada con useCallback
   const sendMessage = useCallback(async (text) => {
     setIsTyping(true);
@@ -262,7 +262,7 @@ const ChatWidget = () => {
       setIsTyping(false);
       setIsLoading(false);
     }
-  }, []);
+  }, [handleResetConversation]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
