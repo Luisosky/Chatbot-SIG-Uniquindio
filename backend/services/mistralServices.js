@@ -301,7 +301,7 @@ const getFileSize = async (filePath) => {
 
 // Modificar la función sendToMistral para detectar múltiples correos
 const sendToMistral = async (userMessage) => {
-  
+  console.log("MISTRAL_API_URL:", process.env.MISTRAL_API_URL);
   
   // Mejorar la detección de intenciones de envío
   const sendIntentPattern = /(envi[ae]r|mandar)\s*(el)?\s*documento\s+([A-Z]+-[A-Z]+-[A-Z]+-\d{2})\s*(a|al|por)?\s*(correo)?/i;
