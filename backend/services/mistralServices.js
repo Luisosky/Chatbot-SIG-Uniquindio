@@ -1,9 +1,9 @@
 const axios = require('axios');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 const sigKnowledge = require('../data/sigKnowledge');
 const nodemailer = require('nodemailer');
 const fs = require('fs').promises;
-const path = require('path');
 
 // Nueva función para listar documentos en la carpeta "documents"
 const listDocuments = async () => {
@@ -301,6 +301,8 @@ const getFileSize = async (filePath) => {
 
 // Modificar la función sendToMistral para detectar múltiples correos
 const sendToMistral = async (userMessage) => {
+  
+  
   // Mejorar la detección de intenciones de envío
   const sendIntentPattern = /(envi[ae]r|mandar)\s*(el)?\s*documento\s+([A-Z]+-[A-Z]+-[A-Z]+-\d{2})\s*(a|al|por)?\s*(correo)?/i;
   const sendIntentMatch = userMessage.match(sendIntentPattern);
