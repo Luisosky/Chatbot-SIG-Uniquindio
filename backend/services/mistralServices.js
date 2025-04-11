@@ -83,23 +83,47 @@ const sendDocumentByEmail = async (email, documentId) => {
   try {
     // Si email es un array, procesar cada correo secuencialmente
     if (Array.isArray(email)) {
-      console.log(`[${new Date().toISOString()}] Iniciando envío múltiple de documento ${documentId} a ${email.length} destinatarios`);
+      console.log(`[${new Date().toISOString()}] 📩 INICIANDO ENVÍO MÚLTIPLE`);
+      console.log(`📄 Documento: ${documentId}`);
+      console.log(`👥 Destinatarios (${email.length}): ${email.join(', ')}`);
+      console.log('==================================================');
       
       const results = [];
       const failures = [];
       
       // Enviar a cada correo de forma secuencial
-      for (const singleEmail of email) {
+      for (let i = 0; i < email.length; i++) {
+        const singleEmail = email[i];
+        console.log(`\n[${new Date().toISOString()}] 🔄 Procesando correo ${i+1}/${email.length}: ${singleEmail}`);
+        
         try {
           const result = await sendDocumentByEmail(singleEmail, documentId);
           results.push({ email: singleEmail, ...result });
+          console.log(`✅ ÉXITO: Enviado a ${singleEmail}`);
           // Esperar un pequeño intervalo entre envíos para no sobrecargar el servidor SMTP
-          await new Promise(r => setTimeout(r, 1000));
+          if (i < email.length - 1) {
+            console.log(`⏱️ Esperando 1 segundo antes del siguiente envío...`);
+            await new Promise(r => setTimeout(r, 1000));
+          }
         } catch (error) {
-          console.error(`Error al enviar a ${singleEmail}:`, error.message);
+          console.error(`❌ ERROR al enviar a ${singleEmail}: ${error.message}`);
           failures.push({ email: singleEmail, error: error.message });
         }
       }
+      
+      // Resumen final de resultados
+      console.log('\n==================================================');
+      console.log(`📊 RESUMEN DE ENVÍO MÚLTIPLE (${new Date().toISOString()})`);
+      console.log(`✅ Enviados correctamente: ${results.length}/${email.length}`);
+      console.log(`❌ Fallos: ${failures.length}/${email.length}`);
+      
+      if (failures.length > 0) {
+        console.log('\n🔍 Detalles de fallos:');
+        failures.forEach((failure, idx) => {
+          console.log(`  ${idx+1}. ${failure.email}: ${failure.error}`);
+        });
+      }
+      console.log('==================================================');
       
       // Retornar resultados consolidados
       return {
@@ -289,12 +313,42 @@ const sendToMistral = async (userMessage) => {
     // Caso 1: Hay una solicitud pendiente de envío
     if (pendingEmailRequest) {
       try {
+        console.log(`Procesando solicitud para enviar a múltiples correos: ${emailMatches.join(', ')}`);
         const result = await sendDocumentByEmail(emailMatches, pendingEmailRequest.documentId);
-        const response = `He enviado el documento ${pendingEmailRequest.documentId} a ${emailMatches.length} correos: ${emailMatches.join(', ')}. 
-        Se enviaron correctamente ${result.totalSent} de ${emailMatches.length} correos.`;
-        conversationHistory.push({ role: 'assistant', content: response });
+        
+        // Generar respuesta visualmente más rica
+        let responseMsg = `# Envío múltiple: ${pendingEmailRequest.documentId}\n\n`;
+        responseMsg += `📊 **Resumen del envío:**\n`;
+        responseMsg += `- **Total de correos:** ${emailMatches.length}\n`;
+        responseMsg += `- ✅ **Enviados correctamente:** ${result.totalSent}\n`;
+        
+        if (result.totalFailed > 0) {
+          responseMsg += `- ❌ **Fallidos:** ${result.totalFailed}\n\n`;
+          
+          // Detalles de correos exitosos
+          responseMsg += `## Correos enviados correctamente:\n`;
+          result.successDetails.forEach(success => {
+            responseMsg += `- ✅ ${success.email}\n`;
+          });
+          
+          // Detalles de fallos
+          responseMsg += `\n## Detalles de fallos:\n`;
+          result.failureDetails.forEach(failure => {
+            responseMsg += `- ❌ ${failure.email}: ${failure.error}\n`;
+          });
+        } else {
+          responseMsg += `\n🎉 **¡Todos los correos fueron enviados exitosamente!**\n\n`;
+          responseMsg += `## Destinatarios:\n`;
+          emailMatches.forEach(email => {
+            responseMsg += `- ✅ ${email}\n`;
+          });
+        }
+        
+        responseMsg += `\n📨 Por favor, verifica las bandejas de entrada (y la carpeta de spam) en unos minutos.`;
+        
+        conversationHistory.push({ role: 'assistant', content: responseMsg });
         pendingEmailRequest = null;
-        return response;
+        return responseMsg;
       } catch (error) {
         const errorMsg = `Lo siento, ocurrió un error al enviar el documento por correo. ${error.message}`;
         conversationHistory.push({ role: 'assistant', content: errorMsg });
@@ -311,10 +365,39 @@ const sendToMistral = async (userMessage) => {
       if (document) {
         try {
           const result = await sendDocumentByEmail(emailMatches, docId);
-          const response = `He enviado el documento ${docId} a ${emailMatches.length} correos: ${emailMatches.join(', ')}. 
-          Se enviaron correctamente ${result.totalSent} de ${emailMatches.length} correos.`;
-          conversationHistory.push({ role: 'assistant', content: response });
-          return response;
+          
+          // Generar respuesta visualmente más rica
+          let responseMsg = `# Envío múltiple: ${docId}\n\n`;
+          responseMsg += `📊 **Resumen del envío:**\n`;
+          responseMsg += `- **Total de correos:** ${emailMatches.length}\n`;
+          responseMsg += `- ✅ **Enviados correctamente:** ${result.totalSent}\n`;
+          
+          if (result.totalFailed > 0) {
+            responseMsg += `- ❌ **Fallidos:** ${result.totalFailed}\n\n`;
+            
+            // Detalles de correos exitosos
+            responseMsg += `## Correos enviados correctamente:\n`;
+            result.successDetails.forEach(success => {
+              responseMsg += `- ✅ ${success.email}\n`;
+            });
+            
+            // Detalles de fallos
+            responseMsg += `\n## Detalles de fallos:\n`;
+            result.failureDetails.forEach(failure => {
+              responseMsg += `- ❌ ${failure.email}: ${failure.error}\n`;
+            });
+          } else {
+            responseMsg += `\n🎉 **¡Todos los correos fueron enviados exitosamente!**\n\n`;
+            responseMsg += `## Destinatarios:\n`;
+            emailMatches.forEach(email => {
+              responseMsg += `- ✅ ${email}\n`;
+            });
+          }
+          
+          responseMsg += `\n📨 Por favor, verifica las bandejas de entrada (y la carpeta de spam) en unos minutos.`;
+          
+          conversationHistory.push({ role: 'assistant', content: responseMsg });
+          return responseMsg;
         } catch (error) {
           const errorMsg = `Lo siento, no pude enviar el documento por correo. ${error.message}`;
           conversationHistory.push({ role: 'assistant', content: errorMsg });
@@ -331,10 +414,39 @@ const sendToMistral = async (userMessage) => {
       if (recentDocId) {
         try {
           const result = await sendDocumentByEmail(emailMatches, recentDocId);
-          const response = `He enviado el documento ${recentDocId} a ${emailMatches.length} correos: ${emailMatches.join(', ')}. 
-          Se enviaron correctamente ${result.totalSent} de ${emailMatches.length} correos.`;
-          conversationHistory.push({ role: 'assistant', content: response });
-          return response;
+          
+          // Generar respuesta visualmente más rica
+          let responseMsg = `# Envío múltiple: ${recentDocId}\n\n`;
+          responseMsg += `📊 **Resumen del envío:**\n`;
+          responseMsg += `- **Total de correos:** ${emailMatches.length}\n`;
+          responseMsg += `- ✅ **Enviados correctamente:** ${result.totalSent}\n`;
+          
+          if (result.totalFailed > 0) {
+            responseMsg += `- ❌ **Fallidos:** ${result.totalFailed}\n\n`;
+            
+            // Detalles de correos exitosos
+            responseMsg += `## Correos enviados correctamente:\n`;
+            result.successDetails.forEach(success => {
+              responseMsg += `- ✅ ${success.email}\n`;
+            });
+            
+            // Detalles de fallos
+            responseMsg += `\n## Detalles de fallos:\n`;
+            result.failureDetails.forEach(failure => {
+              responseMsg += `- ❌ ${failure.email}: ${failure.error}\n`;
+            });
+          } else {
+            responseMsg += `\n🎉 **¡Todos los correos fueron enviados exitosamente!**\n\n`;
+            responseMsg += `## Destinatarios:\n`;
+            emailMatches.forEach(email => {
+              responseMsg += `- ✅ ${email}\n`;
+            });
+          }
+          
+          responseMsg += `\n📨 Por favor, verifica las bandejas de entrada (y la carpeta de spam) en unos minutos.`;
+          
+          conversationHistory.push({ role: 'assistant', content: responseMsg });
+          return responseMsg;
         } catch (error) {
           const errorMsg = `Lo siento, no pude enviar el documento por correo. ${error.message}`;
           conversationHistory.push({ role: 'assistant', content: errorMsg });
@@ -542,7 +654,7 @@ function findRecentDocumentId() {
   // Buscar en los últimos 6 mensajes de la conversación
   for (let i = conversationHistory.length - 1; i >= Math.max(0, conversationHistory.length - 6); i--) {
     const message = conversationHistory[i];
-    // Buscar patrones de ID de documento con el formato correcto VIG-SGL-BPM-INT-08
+    // Buscar patrones de ID de documento con el formato correcto 
     const idMatch = message.content.match(/([A-Z]{3}-[A-Z]{3}-[A-Z]{3}-\d{2})/i);
     if (idMatch) {
       return idMatch[0];
