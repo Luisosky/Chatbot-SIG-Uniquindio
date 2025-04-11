@@ -60,6 +60,8 @@ Cuando proporciones enlaces a documentos, usa siempre su URL exacta de los datos
 
 let conversationHistory = [];
 let pendingEmailRequest = null;
+// Añadir una cola de correos pendientes
+let emailQueue = [];
 
 const resetConversation = () => {
   conversationHistory = [];
@@ -79,8 +81,54 @@ const searchDocuments = (query) => {
 
 const sendDocumentByEmail = async (email, documentId) => {
   try {
+    // Si email es un array, procesar cada correo secuencialmente
+    if (Array.isArray(email)) {
+      console.log(`[${new Date().toISOString()}] Iniciando envío múltiple de documento ${documentId} a ${email.length} destinatarios`);
+      
+      const results = [];
+      const failures = [];
+      
+      // Enviar a cada correo de forma secuencial
+      for (const singleEmail of email) {
+        try {
+          const result = await sendDocumentByEmail(singleEmail, documentId);
+          results.push({ email: singleEmail, ...result });
+          // Esperar un pequeño intervalo entre envíos para no sobrecargar el servidor SMTP
+          await new Promise(r => setTimeout(r, 1000));
+        } catch (error) {
+          console.error(`Error al enviar a ${singleEmail}:`, error.message);
+          failures.push({ email: singleEmail, error: error.message });
+        }
+      }
+      
+      // Retornar resultados consolidados
+      return {
+        success: results.length > 0,
+        totalSent: results.length,
+        totalFailed: failures.length,
+        successDetails: results,
+        failureDetails: failures,
+        timestamp: new Date().toISOString()
+      };
+    }
+    
     console.log(`[${new Date().toISOString()}] Iniciando envío de documento ${documentId} a ${email}`);
-    const document = sigKnowledge.find(doc => doc.id === documentId);
+    
+    // Normalizar el ID (asegurar formato correcto)
+    const normalizedId = documentId.trim().toUpperCase();
+    
+    // Buscar primero por ID exacto
+    let document = sigKnowledge.find(doc => doc.id === normalizedId);
+    
+    // Si no encuentra, intentar buscar por ID parcial (sin prefijos)
+    if (!document) {
+      const idParts = normalizedId.split('-');
+      const partialId = idParts.length > 1 ? idParts.slice(1).join('-') : normalizedId;
+      document = sigKnowledge.find(doc => doc.id.includes(partialId));
+      
+      console.log(`Búsqueda por ID parcial: ${partialId}, Documento encontrado:`, document ? 'Sí' : 'No');
+    }
+    
     if (!document) {
       throw new Error(`Documento con ID ${documentId} no encontrado`);
     }
@@ -227,17 +275,81 @@ const getFileSize = async (filePath) => {
   }
 };
 
+// Modificar la función sendToMistral para detectar múltiples correos
 const sendToMistral = async (userMessage) => {
   // Mejorar la detección de intenciones de envío
-  const sendIntentPattern = /(envi[ae]r|mandar)\s*(el)?\s*documento\s+([A-Z]{3}-[A-Z]{3}-[A-Z]{3}-\d{2})\s*(a|al|por)\s*correo/i;
+  const sendIntentPattern = /(envi[ae]r|mandar)\s*(el)?\s*documento\s+([A-Z]+-[A-Z]+-[A-Z]+-\d{2})\s*(a|al|por)?\s*(correo)?/i;
   const sendIntentMatch = userMessage.match(sendIntentPattern);
+
+  // Extraer todos los correos del mensaje
+  const emailMatches = userMessage.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
+  
+  // Si hay múltiples correos y una solicitud pendiente o un ID mencionado
+  if (emailMatches.length > 1) {
+    // Caso 1: Hay una solicitud pendiente de envío
+    if (pendingEmailRequest) {
+      try {
+        const result = await sendDocumentByEmail(emailMatches, pendingEmailRequest.documentId);
+        const response = `He enviado el documento ${pendingEmailRequest.documentId} a ${emailMatches.length} correos: ${emailMatches.join(', ')}. 
+        Se enviaron correctamente ${result.totalSent} de ${emailMatches.length} correos.`;
+        conversationHistory.push({ role: 'assistant', content: response });
+        pendingEmailRequest = null;
+        return response;
+      } catch (error) {
+        const errorMsg = `Lo siento, ocurrió un error al enviar el documento por correo. ${error.message}`;
+        conversationHistory.push({ role: 'assistant', content: errorMsg });
+        pendingEmailRequest = null;
+        return errorMsg;
+      }
+    }
+    
+    // Caso 2: Hay un ID en el mensaje actual
+    const idMatch = userMessage.match(/([A-Z]{3}-)?([A-Z]{3}-[A-Z]{3}-[A-Z]{3}-\d{2})/i);
+    if (idMatch) {
+      const docId = idMatch[0];
+      const document = sigKnowledge.find(doc => doc.id === docId);
+      if (document) {
+        try {
+          const result = await sendDocumentByEmail(emailMatches, docId);
+          const response = `He enviado el documento ${docId} a ${emailMatches.length} correos: ${emailMatches.join(', ')}. 
+          Se enviaron correctamente ${result.totalSent} de ${emailMatches.length} correos.`;
+          conversationHistory.push({ role: 'assistant', content: response });
+          return response;
+        } catch (error) {
+          const errorMsg = `Lo siento, no pude enviar el documento por correo. ${error.message}`;
+          conversationHistory.push({ role: 'assistant', content: errorMsg });
+          return errorMsg;
+        }
+      }
+    }
+    
+    // Caso 3: Buscar ID reciente si se menciona envío
+    if (userMessage.toLowerCase().includes('enviar') || 
+        userMessage.toLowerCase().includes('mandar') || 
+        userMessage.toLowerCase().includes('por correo')) {
+      const recentDocId = findRecentDocumentId();
+      if (recentDocId) {
+        try {
+          const result = await sendDocumentByEmail(emailMatches, recentDocId);
+          const response = `He enviado el documento ${recentDocId} a ${emailMatches.length} correos: ${emailMatches.join(', ')}. 
+          Se enviaron correctamente ${result.totalSent} de ${emailMatches.length} correos.`;
+          conversationHistory.push({ role: 'assistant', content: response });
+          return response;
+        } catch (error) {
+          const errorMsg = `Lo siento, no pude enviar el documento por correo. ${error.message}`;
+          conversationHistory.push({ role: 'assistant', content: errorMsg });
+          return errorMsg;
+        }
+      }
+    }
+  }
 
   if (sendIntentMatch) {
     const docId = sendIntentMatch[3]; // El ID está en el grupo de captura 3
     const document = sigKnowledge.find(doc => doc.id === docId);
     
     if (document) {
-      const emailMatch = userMessage.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const emailMatch = userMessage.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)
       if (emailMatch) {
         // Si ya proporcionó el correo, enviar directamente
         try {
@@ -275,8 +387,7 @@ const sendToMistral = async (userMessage) => {
 
   // Verificar si hay solicitud de documento y correo en el mismo mensaje
   const emailMatch = userMessage.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  const idMatch = userMessage.match(/([A-Z]{3}-[A-Z]{3}-[A-Z]{3}-\d{2})/i);
-  
+  const idMatch = userMessage.match(/([A-Z]{3}-)?([A-Z]{3}-[A-Z]{3}-[A-Z]{3}-\d{2})/i);
   if (emailMatch && idMatch) {
     const docId = idMatch[0];
     const document = sigKnowledge.find(doc => doc.id === docId);
