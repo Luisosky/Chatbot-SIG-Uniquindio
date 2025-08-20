@@ -428,4 +428,4 @@ Este proyecto está desarrollado para la Universidad del Quindío como parte del
 ---
 
 **Desarrollado por**: Estudiantes de la Universidad del Quindío  
-**Contacto**: contactenos@uniquindio.edu.co
+**Contacto**: luisc.calderonc@uniquindio.edu.co & juanm.amadorr@uqvirtual.edu.co 
