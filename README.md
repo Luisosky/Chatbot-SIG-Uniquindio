@@ -423,7 +423,7 @@ console.log(`👥 Destinatarios (${emails.length}): ${emails.join(', ')}`);
 
 ## 🤝 Contribución
 
-Este proyecto está desarrollado para la Universidad del Quindío como parte del trabajo de graduación. Para contribuciones o reportes de bugs, contactar al equipo de desarrollo a través de los canales oficiales de la universidad.
+Este proyecto está desarrollado para la Universidad del Quindío como parte del trabajo del grupo de IA. Para contribuciones o reportes de bugs, contactar al equipo de desarrollo a través de los siguientes correos.
 
 ---
 
